@@ -1,0 +1,24 @@
+<component name="ArtifactManager">
+  <artifact name="com.asuscomm.gsilidis.youtubeplayer:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/com_asuscomm_gsilidis_youtubeplayer_jar</output-path>
+    <root id="root">
+      <element id="archive" name="com.asuscomm.gsilidis.youtubeplayer.jar">
+        <element id="directory" name="META-INF">
+          <element id="file-copy" path="$PROJECT_DIR$/src/main/resources/META-INF/MANIFEST.MF" />
+        </element>
+        <element id="module-output" name="com.asuscomm.gsilidis.youtubeplayer" />
+        <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/1stleg/jnativehook/2.1.0/jnativehook-2.1.0.jar" path-in-jar="/" />
+        <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/sun/jna/jna/3.0.9/jna-3.0.9.jar" path-in-jar="/" />
+        <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/hynnet/DJNativeSwing-SWT/1.0.0/DJNativeSwing-SWT-1.0.0.jar" path-in-jar="/" />
+        <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/hynnet/DJNativeSwing/1.0.0/DJNativeSwing-1.0.0.jar" path-in-jar="/" />
+      </element>
+      <element id="directory" name="lib">
+        <element id="library" level="project" name="Maven: org.eclipse.swt:org.eclipse.swt.gtk.linux.x86_64:4.3" />
+        <element id="library" level="project" name="Maven: org.eclipse.swt:org.eclipse.swt.gtk.linux.x86:4.3" />
+        <element id="library" level="project" name="Maven: org.eclipse.swt:org.eclipse.swt.win32.win32.x86:4.3" />
+        <element id="library" level="project" name="Maven: org.eclipse.swt:org.eclipse.swt.win32.win32.x86_64:4.3" />
+        <element id="library" level="project" name="Maven: org.eclipse.swt.org.eclipse.swt.cocoa.macosx.x86_64.4.3.swt:org.eclipse.swt.cocoa.macosx.x86_64:4.3" />
+      </element>
+    </root>
+  </artifact>
+</component>
