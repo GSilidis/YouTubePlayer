@@ -63,7 +63,6 @@ public class PlayerPanel extends JPanel
 		JPanel webBrowserPanel = new JPanel(new BorderLayout());
 		webBrowserPanel.setBorder(BorderFactory.createTitledBorder("Player"));
 		webBrowser = new CustomJWebBrowser();
-		//webBrowser.useXULRunnerRuntime();
 		webBrowserPanel.add(webBrowser, BorderLayout.CENTER);
 		webBrowser.setBarsVisible(false);
 		webBrowser.setPreferredSize(new Dimension(655, 380));
@@ -164,13 +163,6 @@ public class PlayerPanel extends JPanel
 		}
 	}
 
-	// TODO: get rid of it
-	public void debugF(int rawCode)
-	{
-		JOptionPane.showMessageDialog(null, "Error: key \'" +
-				rawCode +  "\' was not detected");
-	}
-
 	/**
 	 * This function is called by JS from JWebBrowser component, when state of YouTube player changes
 	 * @param newTitle title of currently played video
@@ -185,6 +177,9 @@ public class PlayerPanel extends JPanel
 	 */
 	public String getVideoTitle()
 	{
-		return videoTitle;
+		if (videoTitle != null)
+			return videoTitle;
+		else
+			return "Artist - Song";
 	}
 }

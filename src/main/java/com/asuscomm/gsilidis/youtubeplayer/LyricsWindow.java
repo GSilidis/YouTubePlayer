@@ -25,21 +25,18 @@ public class LyricsWindow extends JFrame
 	/** Text area contains lyrics */
 	private JTextArea textArea;
 
-	public LyricsWindow(String title) throws IOException
+	public LyricsWindow(String title)
 	{
 		super("Lyrics");
 		setMinimumSize(new Dimension(380, 300));
-
-		if (title == null) // if title is not provided - using placeholder
-		{
-			title = "Artist - Song";
-		}
+		JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
 
 		JPanel container = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 
 		JPanel navPanel = new JPanel();
-		artistField = new JTextField(title.substring(0, title.indexOf("-")).trim()); // Assuming that title looks like ARTIST - SONG
+		String[] parsedTitle = getArtistAndSong(title);
+		artistField = new JTextField(parsedTitle[0]);
 		artistField.setColumns(15);
 		navPanel.add(artistField);
 		JButton swap = new JButton("<->");
@@ -55,7 +52,7 @@ public class LyricsWindow extends JFrame
 			}
 		});
 		navPanel.add(swap);
-		songField = new JTextField(title.substring(title.indexOf("-")+1).trim());
+		songField = new JTextField(parsedTitle[1]);
 		songField.setColumns(15);
 		navPanel.add(songField);
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -94,6 +91,45 @@ public class LyricsWindow extends JFrame
 		container.add(textPane, c);
 
 		add(container);
+	}
+
+	public void setNewTitle(String title)
+	{
+		String[] parsedTitle = getArtistAndSong(title);
+		artistField.setText(parsedTitle[0]);
+		songField.setText(parsedTitle[1]);
+		textArea.setText(findLyrics());
+	}
+
+	/**
+	 * Parses video's title and searching for artist and song title
+	 * @param title Video title
+	 * @return Array: [0] - Artist name; [1] - Song title. Returns placeholder if not found anything
+	 */
+	private String[] getArtistAndSong(String title)
+	{
+		String[] results = new String[2];
+		if (title.toLowerCase().contains(" by ")) // Song by Artist
+		{
+			results[0] = title.substring(title.toLowerCase().indexOf(" by ") + 4).trim();
+			results[1] = title.substring(0, title.toLowerCase().indexOf(" by ")).trim();
+		}
+		else if (title.contains("-")) // Artist - Song
+		{
+			results[0] = title.substring(0, title.indexOf("-")).trim();
+			results[1] = title.substring(title.indexOf("-") + 1).trim();
+		}
+		else if (title.contains("\"")) // Artist "Song"
+		{
+			results[0] = title.substring(0, title.indexOf("\"")).trim();
+			results[1] = title.substring(title.indexOf("\"")).trim();
+		}
+		else
+		{
+			results[0] = "Artist";
+			results[1] = "Song";
+		}
+		return results;
 	}
 
 	/**

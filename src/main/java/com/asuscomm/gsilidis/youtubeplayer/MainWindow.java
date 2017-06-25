@@ -21,6 +21,7 @@ public class MainWindow extends JFrame implements WindowListener, NativeKeyListe
 {
 	/** JPanel that contains player and its controls */
 	private PlayerPanel playerPanel;
+	private LyricsWindow lyricsWindow;
 
 	public MainWindow(String s)
 	{
@@ -44,23 +45,23 @@ public class MainWindow extends JFrame implements WindowListener, NativeKeyListe
 			@Override
 			public void actionPerformed(ActionEvent actionEvent)
 			{
-
-				LyricsWindow frame = null;
-				try
+				if (lyricsWindow == null)
 				{
-					frame = new LyricsWindow(playerPanel.getVideoTitle());
-				} catch (IOException e)
-				{
-					e.printStackTrace();
+					lyricsWindow = new LyricsWindow(playerPanel.getVideoTitle());
+					lyricsWindow.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+					lyricsWindow.pack();
+					GraphicsEnvironment environment = GraphicsEnvironment.getLocalGraphicsEnvironment();
+					Rectangle windowBounds = environment.getMaximumWindowBounds(); // Getting maximum possible size for window
+					lyricsWindow.setSize((int) Math.min(windowBounds.getWidth(), lyricsWindow.getWidth()),
+							(int) Math.min(windowBounds.getHeight(), lyricsWindow.getHeight())); // Doesn't allow window to get bigger than screen
+					lyricsWindow.setLocationByPlatform(true);
+					lyricsWindow.setVisible(true);
 				}
-				//frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-				frame.pack();
-				GraphicsEnvironment environment = GraphicsEnvironment.getLocalGraphicsEnvironment();
-				Rectangle windowBounds = environment.getMaximumWindowBounds(); // Getting maximum possible size for window
-				frame.setSize((int)Math.min(windowBounds.getWidth(), frame.getWidth()),
-						(int)Math.min(windowBounds.getHeight(), frame.getHeight())); // Doesn't allow window to get bigger than screen
-				frame.setLocationByPlatform(true);
-				frame.setVisible(true);
+				else
+				{
+					lyricsWindow.setNewTitle(playerPanel.getVideoTitle());
+					lyricsWindow.setVisible(true);
+				}
 			}});
 		menu.add(menuItem);
 		setJMenuBar(menuBar);
@@ -94,7 +95,7 @@ public class MainWindow extends JFrame implements WindowListener, NativeKeyListe
 					playerPanel.nextVideo();
 					break;
 				default:
-					playerPanel.debugF(nativeKeyEvent.getRawCode());
+					break;
 			}
 		}
 		else
