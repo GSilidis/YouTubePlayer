@@ -1,6 +1,7 @@
 package com.asuscomm.gsilidis.youtubeplayer;
 
 import chrriis.dj.nativeswing.swtimpl.components.JWebBrowser;
+import com.sun.istack.internal.Nullable;
 
 import javax.swing.*;
 import java.net.MalformedURLException;
@@ -45,75 +46,22 @@ public class CustomJWebBrowser extends JWebBrowser
 	}
 
 	/**
-	 * Parses link and sets up web page for playback
-	 * @param urlToVideo URL to youtube video or playlist
-	 * @return 0 if urlToVideo points to single video, 1 - to playlist and -1 in case of error
+	 * Sets content of video player
+	 * @param videoPlaylist ID of video or playlist; null creates empty player
+	 * @param onPlayerReadyFunction code to execute on player load; null for default
 	 */
-	public int setVideoLink(String urlToVideo)
+	public void setVideo(@Nullable String[] videoPlaylist, @Nullable String onPlayerReadyFunction)
 	{
-		URL link = null;
-		String videoHtml = "";
-		String url = urlToVideo;
-		int type;
-		if (!url.contains("https://") && !url.contains("http://"))
-			url = "http://" + url;
-		try
+		StringBuilder videoHtml = new StringBuilder("");
+		String videoList = "";
+		if (videoPlaylist != null)
 		{
-			link = new URL(url);
-		} catch (MalformedURLException e)
-		{
-			JOptionPane.showMessageDialog(null, "URL is not recognised",
-					"Error", JOptionPane.ERROR_MESSAGE);
-			return -1;
+			if (videoPlaylist[0] != null) videoHtml.append(" videoId: '" + videoPlaylist[0] + "',");
+			if (videoPlaylist[1] != null) videoHtml.append(" playerVars: { listType:'playlist', list:'" + videoPlaylist[1] + "' },");
 		}
-
-		if (link.getHost().toLowerCase().contains("youtube"))
+		if (onPlayerReadyFunction == null)
 		{
-			String[] params = link.getQuery().split("&");
-			Map<String, String> map = new HashMap<String, String>();
-			for (String param : params)
-			{
-				String name = param.split("=")[0];
-				String value = param.split("=")[1];
-				map.put(name, value);
-			}
-			if (map.containsKey("list")) // If we got playlist
-			{
-				if (map.containsKey("v"))
-				{
-					videoHtml = "videoId: '" + map.get("v") + "',\n";
-				}
-				videoHtml += "playerVars:\n{\nlistType:'playlist',\nlist:'" + map.get("list") + "'\n}";
-				type = 1;
-			}
-			else // If only single video
-			{
-				videoHtml = "videoId: '" + map.get("v") + "'";
-				type = 0;
-			}
-		}
-		else
-		{
-			if (link.getHost().toLowerCase().equals("youtu.be")) // short link
-			{
-				String query = link.getQuery();
-				videoHtml = "videoId: '" + link.getPath().substring(1) + "',\n"; // Because it gets path with '/'
-				if (query != null) // If playlist
-				{
-					videoHtml += "playerVars:\n{\nlistType:'playlist',\nlist:'" + query.substring(query.indexOf('=')+1) + "'\n}";
-					type = 1;
-				}
-				else // If single video
-				{
-					type = 0;
-				}
-			}
-			else
-			{
-				JOptionPane.showMessageDialog(null, "Resource \'" + link.getHost() +  "\' is not supported",
-						"Error", JOptionPane.ERROR_MESSAGE);
-				return -1;
-			}
+			onPlayerReadyFunction = "event.target.playVideo();"; // If not provided - setting default behaviour
 		}
 		setHTMLContent(
 				"<!DOCTYPE html>\r\n" +
@@ -135,7 +83,6 @@ public class CustomJWebBrowser extends JWebBrowser
 						"          {\n" +
 						"              height: '360',\n" +
 						"              width: '640'," + videoHtml + "\n" +
-						"              ,\n" +
 						"              events: \n" +
 						"              {\n" +
 						"                  'onReady': onPlayerReady,\n" +
@@ -143,9 +90,9 @@ public class CustomJWebBrowser extends JWebBrowser
 						"              }\n" +
 						"          });\n" +
 						"       }\n" +
-						"       function onPlayerReady(event)" +
+						"       function onPlayerReady(event)\n" +
 						"       {\n" +
-						"           event.target.playVideo();\n" +
+						"           " + onPlayerReadyFunction + "\n" +
 						"       }\n" +
 						"       var done = false;\n" +
 						"       function onPlayerStateChange(event)\n" +
@@ -156,7 +103,7 @@ public class CustomJWebBrowser extends JWebBrowser
 						"       }\n" +
 						"       function toggleVideo()\n" +
 						"       {\n" +
-						"           if(player.getPlayerState() != 1)" +
+						"           if(player.getPlayerState() != 1)\n" +
 						"           {\n" +
 						"              player.playVideo();\n" +
 						"           }else{\n" +
@@ -173,6 +120,5 @@ public class CustomJWebBrowser extends JWebBrowser
 						"       }\n" +
 						"   </script>\n" +
 						"</body> </html>");
-		return type;
 	}
 }

@@ -36,18 +36,21 @@ public class PlayerPanel extends JPanel
 			@Override
 			public void actionPerformed(ActionEvent actionEvent)
 			{
-				switch(webBrowser.setVideoLink(idIn.getText()))
+				MainWindow parent = (MainWindow) SwingUtilities.getWindowAncestor(PlayerPanel.this);
+				String[] videoPlaylist = parent.getVideoPlaylistID(idIn.getText());
+				if (videoPlaylist[1] == null)
 				{
-					case 0:
-						inPlaylist = false;
-						break;
-					case 1:
-						inPlaylist = true;
-						break;
-					case -1:
-					default:
-						break;
+					if (videoPlaylist[0] == null)
+					{
+						return; // URL cannot be parsed
+					}
 				}
+				else
+				{
+					inPlaylist = true;
+				}
+				webBrowser.setVideo(videoPlaylist, null);
+
 			}
 		};
 		idIn.addActionListener(navigateToAction);
@@ -163,14 +166,11 @@ public class PlayerPanel extends JPanel
 		}
 	}
 
-	/**
-	 * This function is called by JS from JWebBrowser component, when state of YouTube player changes
-	 * @param newTitle title of currently played video
-	 */
-	public void setVideoTitle(String newTitle)
+	public void setInPlaylist(boolean inPlaylist)
 	{
-		videoTitle = newTitle;
+		this.inPlaylist = true;
 	}
+
 
 	/**
 	 * @return title of current video
@@ -181,5 +181,10 @@ public class PlayerPanel extends JPanel
 			return videoTitle;
 		else
 			return "Artist - Song";
+	}
+
+	public void setPlaylist(String IDs)
+	{
+		webBrowser.setVideo(null, "player.loadPlaylist([ " + IDs + " ]);");
 	}
 }

@@ -4,12 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
 
 /**
  * Window that contains lyrics
@@ -25,11 +21,14 @@ public class LyricsWindow extends JFrame
 	/** Text area contains lyrics */
 	private JTextArea textArea;
 
-	public LyricsWindow(String title)
+	/** Pointer to calling window */
+	private MainWindow parent;
+
+	public LyricsWindow(String title, MainWindow parent)
 	{
 		super("Lyrics");
+		this.parent = parent;
 		setMinimumSize(new Dimension(380, 300));
-		JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
 
 		JPanel container = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -93,6 +92,10 @@ public class LyricsWindow extends JFrame
 		add(container);
 	}
 
+	/**
+	 * Used for recycling current window and for showing lyrics for new song
+	 * @param title title of the new video
+	 */
 	public void setNewTitle(String title)
 	{
 		String[] parsedTitle = getArtistAndSong(title);
@@ -141,7 +144,7 @@ public class LyricsWindow extends JFrame
 		String lyrics = null;
 		try
 		{
-			lyrics = readFromUrl("http://api.chartlyrics.com/apiv1.asmx/SearchLyricDirect?artist=" +
+			lyrics = parent.readFromUrl("http://api.chartlyrics.com/apiv1.asmx/SearchLyricDirect?artist=" +
 					URLEncoder.encode(artistField.getText(), "UTF-8") +
 					"&song=" + URLEncoder.encode(songField.getText(), "UTF-8"));
 			String src = lyrics.substring(lyrics.indexOf("<LyricUrl>")+10, lyrics.indexOf("</LyricUrl>"));
@@ -160,30 +163,4 @@ public class LyricsWindow extends JFrame
 	}
 
 
-	/**
-	 * Reads data from web resource by url
-	 * @param urlString URL to resource
-	 * @return String with content from resource
-	 * @throws IOException In case of connection problems or too big content
-	 */
-	private static String readFromUrl(String urlString) throws IOException
-	{
-		BufferedReader reader = null;
-		try
-		{
-			URL url = new URL(urlString);
-			reader = new BufferedReader(new InputStreamReader(url.openStream(),  Charset.forName("UTF-8")));
-			StringBuffer buffer = new StringBuffer();
-			int read;
-			char[] chars = new char[4096];
-			while ((read = reader.read(chars)) != -1)
-				buffer.append(chars, 0, read);
-			return buffer.toString();
-		}
-		finally
-		{
-			if (reader != null)
-				reader.close();
-		}
-	}
 }
