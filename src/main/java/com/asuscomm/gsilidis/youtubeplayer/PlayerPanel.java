@@ -7,6 +7,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * JPanel that contains player and its controls
@@ -83,7 +86,21 @@ public class PlayerPanel extends JPanel
 
 		// Playback controls
 		JPanel buttonPanel = new JPanel(new FlowLayout());
+		InputStream inputStream = getClass().getClassLoader().getResourceAsStream("fonts/Symbola.ttf");
+		Font unicodeFont = null;
+		try
+		{
+			unicodeFont = Font.createFont(Font.TRUETYPE_FONT, inputStream);
+			unicodeFont = unicodeFont.deriveFont(Font.PLAIN, 15f);
+		} catch (FontFormatException e)
+		{
+			e.printStackTrace();
+		} catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 		JButton prevButton = new JButton("⏮");
+		prevButton.setFont(unicodeFont);
 		prevButton.addActionListener(new ActionListener()
 		{
 			@Override
@@ -93,6 +110,7 @@ public class PlayerPanel extends JPanel
 			}
 		});
 		JButton startButton = new JButton("⏯");
+		startButton.setFont(unicodeFont);
 		startButton.addActionListener(new ActionListener()
 		{
 			@Override
@@ -102,6 +120,7 @@ public class PlayerPanel extends JPanel
 			}
 		});
 		JButton stopButton = new JButton("■");
+		stopButton.setFont(unicodeFont);
 		stopButton.addActionListener(new ActionListener()
 		{
 			@Override
@@ -119,6 +138,7 @@ public class PlayerPanel extends JPanel
 				nextVideo();
 			}
 		});
+		nextButton.setFont(unicodeFont);
 		buttonPanel.add(prevButton);
 		buttonPanel.add(startButton);
 		buttonPanel.add(stopButton);
