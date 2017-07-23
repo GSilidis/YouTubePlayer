@@ -28,9 +28,10 @@ public class MainWindow extends JFrame implements WindowListener, NativeKeyListe
 {
 	/** JPanel that contains player and its controls */
 	private PlayerPanel playerPanel;
-	/** JPanel that contains lyrics*/
+	/** JPanel that contains lyrics */
 	private LyricsWindow lyricsWindow;
-
+	/** JPanel for playlist editor */
+	private PlaylistWindow playlistWindow;
 	public MainWindow(String s)
 	{
 		super(s);
@@ -52,9 +53,17 @@ public class MainWindow extends JFrame implements WindowListener, NativeKeyListe
 			@Override
 			public void actionPerformed(ActionEvent actionEvent)
 			{
-				PlaylistWindow playlistWindow = new PlaylistWindow(MainWindow.this);
-				playlistWindow.pack();
-				playlistWindow.setVisible(true);
+				if (playlistWindow == null)
+				{
+					playlistWindow = new PlaylistWindow(MainWindow.this);
+					playlistWindow.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+					playlistWindow.pack();
+					playlistWindow.setVisible(true);
+				}
+				else
+				{
+					playlistWindow.setVisible(true);
+				}
 
 			}
 		});
@@ -95,7 +104,7 @@ public class MainWindow extends JFrame implements WindowListener, NativeKeyListe
 
 	/** Used for creating playlist using id of videos
 	 * @param IDs list of videos
-	 * @param isMoreThanOneVideo true when playlist contains more tha one video
+	 * @param isMoreThanOneVideo true when playlist contains more than one video
 	 */
 	public void setNewPlaylist(String IDs, boolean isMoreThanOneVideo)
 	{

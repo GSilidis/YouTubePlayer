@@ -1,10 +1,11 @@
 package com.asuscomm.gsilidis.youtubeplayer;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
+import java.io.*;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -16,12 +17,18 @@ public class PlaylistWindow extends JFrame
 	private PlaylistListModel listModel;
 	/** Pointer to calling window */
 	private MainWindow parent;
+	/** Used for picking up saving files */
+	final private JFileChooser fileChooser;
 
 	public PlaylistWindow(final MainWindow parent)
 	{
 		super("Playlist editor");
 		this.parent = parent;
 		setMinimumSize(new Dimension(200, 250));
+		fileChooser = new JFileChooser();
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("Youtube playlist file (*.ypl)", "ypl");
+		fileChooser.setFileFilter(filter);
+		fileChooser.setAcceptAllFileFilterUsed(false);
 
 		JPanel container = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -144,7 +151,7 @@ public class PlaylistWindow extends JFrame
 		container.add(actionsContainer, c);
 
 		JPanel optionsContainer = new JPanel();
-		JButton setPlaylist = new JButton("Set playlist");
+		JButton setPlaylist = new JButton("Set");
 		setPlaylist.addActionListener(new ActionListener()
 		{
 			@Override
@@ -154,6 +161,85 @@ public class PlaylistWindow extends JFrame
 			}
 		});
 		optionsContainer.add(setPlaylist);
+		JButton saveButton = new JButton("Save");
+		saveButton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent actionEvent)
+			{
+				if (listModel.getSize() > 0)
+				{
+					int returnVal = fileChooser.showSaveDialog(PlaylistWindow.this);
+					if (returnVal == JFileChooser.APPROVE_OPTION)
+					{
+						PrintWriter writer = null;
+						String saveFilePath = fileChooser.getSelectedFile().getAbsolutePath();
+						File saveFile;
+						if (saveFilePath.contains(".") &&
+								saveFilePath.substring(saveFilePath.lastIndexOf('.')).equals(".ypl"))
+							saveFile = new File(saveFilePath);
+						else
+							saveFile = new File(saveFilePath + ".ypl");
+						try
+						{
+							writer = new PrintWriter(saveFile, "UTF-8");
+						} catch (IOException e)
+						{
+							JOptionPane.showMessageDialog(null, "Cannot write to selected file\n" + e.toString(),
+									"Error", JOptionPane.ERROR_MESSAGE);
+						}
+						if (writer != null)
+						{
+							for (int i = 0; i < listModel.getSize(); i++)
+							{
+								writer.println(listModel.getIDAt(i) + "|" + listModel.getElementAt(i));
+							}
+							writer.close();
+						}
+					}
+				}
+				else
+				{
+					JOptionPane.showMessageDialog(null, "Nothing to save",
+							"Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
+		optionsContainer.add(saveButton);
+		JButton loadButton = new JButton("Load");
+		loadButton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent actionEvent)
+			{
+				int returnVal = fileChooser.showOpenDialog(PlaylistWindow.this);
+				if (returnVal == JFileChooser.APPROVE_OPTION)
+				{
+					File file = fileChooser.getSelectedFile();
+					try
+					{
+						BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+						String line;
+						try
+						{
+							while ((line = bufferedReader.readLine()) != null)
+							{
+								listModel.addElement(line.substring(line.indexOf('|')+1), line.substring(0, line.indexOf('|')));
+							}
+						} catch (IOException e)
+						{
+							JOptionPane.showMessageDialog(null, "Unable to read file\n" + e.toString(),
+									"Error", JOptionPane.ERROR_MESSAGE);
+						}
+					} catch (IOException e)
+					{
+						JOptionPane.showMessageDialog(null, "Unable to read file\n" + e.toString(),
+								"Error", JOptionPane.ERROR_MESSAGE);
+					}
+				}
+			}
+		});
+		optionsContainer.add(loadButton);
 		c.gridy = 1;
 		c.gridx = 0;
 		c.weightx = 1;

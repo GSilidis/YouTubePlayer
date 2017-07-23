@@ -1,6 +1,8 @@
 package com.asuscomm.gsilidis.youtubeplayer;
 
 import javax.swing.*;
+import javax.swing.text.html.ObjectView;
+import java.util.Observable;
 import java.util.Vector;
 
 /**
@@ -111,5 +113,10 @@ public class PlaylistListModel extends AbstractListModel
 	public Object getElementAt(int i)
 	{
 		return titles.get(i);
+	}
+
+	public Object getIDAt(int i)
+	{
+		return ids.get(i);
 	}
 }
