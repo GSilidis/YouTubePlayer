@@ -6,7 +6,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Playlist editor's window
@@ -24,7 +27,7 @@ public class PlaylistWindow extends JFrame
 	{
 		super("Playlist editor");
 		this.parent = parent;
-		setMinimumSize(new Dimension(200, 250));
+		setMinimumSize(new Dimension(290, 250));
 		fileChooser = new JFileChooser();
 		FileNameExtensionFilter filter = new FileNameExtensionFilter("Youtube playlist file (*.ypl)", "ypl");
 		fileChooser.setFileFilter(filter);
@@ -42,7 +45,9 @@ public class PlaylistWindow extends JFrame
 		c.fill = GridBagConstraints.BOTH;
 		c.anchor = GridBagConstraints.PAGE_START;
 		c.insets = new Insets(3, 3, 0, 1);
-		container.add(list, c);
+		final JScrollPane listPane = new JScrollPane(list,
+				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		container.add(listPane, c);
 
 		JPanel actionsContainer = new JPanel();
 		actionsContainer.setLayout(new GridLayout(4, 0));
@@ -57,11 +62,12 @@ public class PlaylistWindow extends JFrame
 				if (userInput != null && !userInput.equals(""))
 				{
 					final String[] id = PlaylistWindow.this.parent.getVideoPlaylistID(userInput);
-
-					final JOptionPane optionPane = new JOptionPane("Please wait", JOptionPane.INFORMATION_MESSAGE,
+					if (id[0] == null && id[1] == null)
+						return;
+					final JOptionPane optionPane = new JOptionPane("Fetching video information", JOptionPane.INFORMATION_MESSAGE,
 							JOptionPane.DEFAULT_OPTION, null, new Object[]{}, null);
 					final JDialog dialog = new JDialog();
-					dialog.setTitle("Fetching video information");
+					dialog.setTitle("Please wait");
 					dialog.setModal(true);
 					dialog.setContentPane(optionPane);
 					dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
@@ -73,8 +79,12 @@ public class PlaylistWindow extends JFrame
 						@Override
 						protected String doInBackground() throws InterruptedException, IOException
 						{
-
-							return PlaylistWindow.this.parent.readFromUrl("https://www.youtube.com/watch?v=" + id[0]);
+							if (id[1] == null)
+								return PlaylistWindow.this.parent.readFromUrl("https://www.youtube.com/watch?v="
+										+ id[0]);
+							else
+								return PlaylistWindow.this.parent.readFromUrl("https://www.youtube.com/playlist?list="
+										+ id[1]);
 						}
 
 						@Override
@@ -88,9 +98,74 @@ public class PlaylistWindow extends JFrame
 					dialog.setVisible(true);
 					try
 					{
-						String title=worker.get();
-						title = title.substring(title.indexOf("<title>") + 7, title.indexOf(" - YouTube</title>"));
-						listModel.addElement(title, id[0]);
+						String html=worker.get();
+						if (id[1] == null) // if fetching single video
+						{
+							html = html.substring(html.indexOf("<title>") + 7, html.indexOf(" - YouTube</title>"));
+							listModel.addElement(html, id[0]);
+						}
+						else // if its playlist
+						{
+							String title;
+							String videoId;
+							String curString;
+							java.util.List<String> allMatches = new ArrayList<String>();
+							// What kind of page is it?
+							if (html.contains("<tbody id=\"pl-load-more-destination\">")) // Old style page
+							{
+								html = html.substring(html.indexOf("<tbody id=\"pl-load-more-destination\">") + 37);
+								html = html.substring(0, html.indexOf("</tbody>"));
+
+								Matcher matcher = Pattern.compile("<tr class=\"pl-video yt-uix-tile \".*?>",
+										Pattern.DOTALL | Pattern.MULTILINE).matcher(html);
+
+								while (matcher.find())
+								{
+									allMatches.add(matcher.group());
+								}
+
+								for (int i = 0; i < allMatches.size(); i++)
+								{
+									curString = allMatches.get(i);
+									//curString = curString.substring(curString.indexOf("data-title") + 12);
+									title = curString.substring(curString.indexOf("data-title") + 12);
+									title = title.substring(0, title.indexOf('"'));
+									videoId = curString.substring(curString.indexOf("data-video-id") + 15);
+									videoId = videoId.substring(0, videoId.indexOf('"'));
+									listModel.addElement(title, videoId);
+								}
+							}
+							else
+							{
+								if (html.contains("\"playlistVideoListRenderer\": {")) // New style page
+								{
+									html = html.substring(html.indexOf("\"playlistVideoListRenderer\": {")+30);
+
+									Matcher matcher = Pattern.compile("\"playlistVideoRenderer\": \\{.*?simpleText.*?\\}",
+											Pattern.DOTALL | Pattern.MULTILINE).matcher(html);
+
+									while (matcher.find())
+									{
+										allMatches.add(matcher.group());
+									}
+
+									for (int i = 0; i < allMatches.size(); i++)
+									{
+										curString = allMatches.get(i);
+										title = curString.substring(curString.indexOf("simpleText") + 14);
+										title = title.substring(0, title.indexOf('"'));
+										videoId = curString.substring(curString.indexOf("videoId") + 11);
+										videoId = videoId.substring(0, videoId.indexOf('"'));
+										listModel.addElement(title, videoId);
+									}
+								}
+								else // Something unknown
+								{
+									JOptionPane.showMessageDialog(null, "Unable to fetch playlist information",
+											"Error", JOptionPane.ERROR_MESSAGE);
+								}
+							}
+						}
 					} catch (IndexOutOfBoundsException e)
 					{
 						JOptionPane.showMessageDialog(null, "Unable to fetch video information",
@@ -147,10 +222,55 @@ public class PlaylistWindow extends JFrame
 		c.weighty = 1;
 		c.gridy = 0;
 		c.gridx = 1;
-		c.insets = new Insets(10, 1, 8, 0);
+		c.insets = new Insets(10, 1, 8, 2);
 		container.add(actionsContainer, c);
 
 		JPanel optionsContainer = new JPanel();
+		JButton newButton = new JButton("New");
+		newButton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent actionEvent)
+			{
+				listModel.clear();
+			}
+		});
+		optionsContainer.add(newButton);
+
+		JButton loadButton = new JButton("Load");
+		loadButton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent actionEvent)
+			{
+				int returnVal = fileChooser.showOpenDialog(PlaylistWindow.this);
+				if (returnVal == JFileChooser.APPROVE_OPTION)
+				{
+					File file = fileChooser.getSelectedFile();
+					try
+					{
+						BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+						String line;
+						try
+						{
+							while ((line = bufferedReader.readLine()) != null)
+							{
+								listModel.addElement(line.substring(line.indexOf('|')+1), line.substring(0, line.indexOf('|')));
+							}
+						} catch (IOException e)
+						{
+							JOptionPane.showMessageDialog(null, "Unable to read file\n" + e.toString(),
+									"Error", JOptionPane.ERROR_MESSAGE);
+						}
+					} catch (IOException e)
+					{
+						JOptionPane.showMessageDialog(null, "Unable to read file\n" + e.toString(),
+								"Error", JOptionPane.ERROR_MESSAGE);
+					}
+				}
+			}
+		});
+		optionsContainer.add(loadButton);
 		JButton setPlaylist = new JButton("Set");
 		setPlaylist.addActionListener(new ActionListener()
 		{
@@ -206,40 +326,8 @@ public class PlaylistWindow extends JFrame
 			}
 		});
 		optionsContainer.add(saveButton);
-		JButton loadButton = new JButton("Load");
-		loadButton.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent actionEvent)
-			{
-				int returnVal = fileChooser.showOpenDialog(PlaylistWindow.this);
-				if (returnVal == JFileChooser.APPROVE_OPTION)
-				{
-					File file = fileChooser.getSelectedFile();
-					try
-					{
-						BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-						String line;
-						try
-						{
-							while ((line = bufferedReader.readLine()) != null)
-							{
-								listModel.addElement(line.substring(line.indexOf('|')+1), line.substring(0, line.indexOf('|')));
-							}
-						} catch (IOException e)
-						{
-							JOptionPane.showMessageDialog(null, "Unable to read file\n" + e.toString(),
-									"Error", JOptionPane.ERROR_MESSAGE);
-						}
-					} catch (IOException e)
-					{
-						JOptionPane.showMessageDialog(null, "Unable to read file\n" + e.toString(),
-								"Error", JOptionPane.ERROR_MESSAGE);
-					}
-				}
-			}
-		});
-		optionsContainer.add(loadButton);
+
+
 		c.gridy = 1;
 		c.gridx = 0;
 		c.weightx = 1;

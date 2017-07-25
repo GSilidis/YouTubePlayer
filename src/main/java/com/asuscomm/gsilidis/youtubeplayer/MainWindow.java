@@ -39,6 +39,7 @@ public class MainWindow extends JFrame implements WindowListener, NativeKeyListe
 
 		addWindowListener(this);
 		playerPanel = new PlayerPanel();
+		setMinimumSize(new Dimension(500, 300));
 
 		// Menu panel
 		JMenuBar menuBar;
@@ -63,6 +64,7 @@ public class MainWindow extends JFrame implements WindowListener, NativeKeyListe
 				else
 				{
 					playlistWindow.setVisible(true);
+					playlistWindow.repaint();
 				}
 
 			}
@@ -95,6 +97,7 @@ public class MainWindow extends JFrame implements WindowListener, NativeKeyListe
 				{
 					lyricsWindow.setNewTitle(playerPanel.getVideoTitle());
 					lyricsWindow.setVisible(true);
+					lyricsWindow.repaint();
 				}
 			}});
 		extraMenu.add(lyricsMenuItem);
@@ -259,7 +262,8 @@ public class MainWindow extends JFrame implements WindowListener, NativeKeyListe
 		}
 		catch (NativeHookException ex)
 		{
-			JOptionPane.showMessageDialog(null, "There was a problem registering native hook\nMedia keys is not supported", "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "There was a problem registering native hook\nMedia keys is not supported",
+					"Error", JOptionPane.ERROR_MESSAGE);
 		}
 
 		GlobalScreen.addNativeKeyListener(this);

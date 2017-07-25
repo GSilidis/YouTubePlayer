@@ -88,6 +88,17 @@ public class PlaylistListModel extends AbstractListModel
 	}
 
 	/**
+	 * Removes all elements from list
+	 */
+	public void clear()
+	{
+		int size = titles.size();
+		titles.clear();
+		ids.clear();
+		fireIntervalRemoved(this, 0, size);
+	}
+
+	/**
 	 * Used for sending string that contains all videos' ids
 	 * @return List of all ids, divided with ',' symbol
 	 */

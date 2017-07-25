@@ -28,7 +28,7 @@ public class LyricsWindow extends JFrame
 	{
 		super("Lyrics");
 		this.parent = parent;
-		setMinimumSize(new Dimension(380, 300));
+		setMinimumSize(new Dimension(420, 300));
 
 		JPanel container = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
