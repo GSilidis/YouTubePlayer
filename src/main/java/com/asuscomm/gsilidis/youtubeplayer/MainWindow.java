@@ -39,7 +39,7 @@ public class MainWindow extends JFrame implements WindowListener, NativeKeyListe
 
 		addWindowListener(this);
 		playerPanel = new PlayerPanel();
-		setMinimumSize(new Dimension(500, 300));
+		setMinimumSize(new Dimension(300, 300));
 
 		// Menu panel
 		JMenuBar menuBar;

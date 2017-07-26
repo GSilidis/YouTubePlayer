@@ -33,12 +33,24 @@ public class LyricsWindow extends JFrame
 		JPanel container = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 
-		JPanel navPanel = new JPanel();
+		JPanel navPanel = new JPanel(new GridBagLayout());
 		String[] parsedTitle = getArtistAndSong(title);
+		Action searchAction = new AbstractAction()
+		{
+			@Override
+			public void actionPerformed(ActionEvent actionEvent)
+			{
+				textArea.setText(findLyrics());
+			}
+		};
 		artistField = new JTextField(parsedTitle[0]);
-		artistField.setColumns(15);
-		navPanel.add(artistField);
+		artistField.addActionListener(searchAction);
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.insets = new Insets(5, 7, 5, 7);
+		c.weightx = 1;
+		navPanel.add(artistField, c);
 		JButton swap = new JButton("<->");
+		swap.setToolTipText("Swap artist and song name fields");
 		swap.addActionListener(new ActionListener()
 		{
 			@Override
@@ -50,10 +62,14 @@ public class LyricsWindow extends JFrame
 				songField.setText(buff);
 			}
 		});
-		navPanel.add(swap);
+		c.weightx = 0;
+		navPanel.add(swap, c);
 		songField = new JTextField(parsedTitle[1]);
-		songField.setColumns(15);
-		navPanel.add(songField);
+		songField.addActionListener(searchAction);
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 1;
+		navPanel.add(songField, c);
+		c.insets = new Insets(0, 0, 0, 0);
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.anchor = GridBagConstraints.PAGE_START;
 		c.weightx = 1;
@@ -61,14 +77,7 @@ public class LyricsWindow extends JFrame
 		container.add(navPanel, c);
 
 		JButton search = new JButton("Search for lyrics");
-		search.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent actionEvent)
-			{
-				textArea.setText(findLyrics());
-			}
-		});
+		search.addActionListener(searchAction);
 		search.setAlignmentX(Component.CENTER_ALIGNMENT);
 		c = new GridBagConstraints();
 		c.gridy = 1;

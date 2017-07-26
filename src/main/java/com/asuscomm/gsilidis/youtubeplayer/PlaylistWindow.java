@@ -49,16 +49,16 @@ public class PlaylistWindow extends JFrame
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		container.add(listPane, c);
 
-		JPanel actionsContainer = new JPanel();
-		actionsContainer.setLayout(new GridLayout(4, 0));
+		JPanel actionsContainer = new JPanel(new GridLayout(4, 0));
 		JButton addVideo = new JButton("+");
+		addVideo.setToolTipText("Add single video or playlist");
 		addVideo.addActionListener(new ActionListener()
 		{
 			@Override
 			public void actionPerformed(ActionEvent actionEvent)
 			{
 				final String userInput = (String) JOptionPane.showInputDialog(PlaylistWindow.this,
-						"Enter video URL", "Add video",	JOptionPane.PLAIN_MESSAGE, null, null, null);
+						"Enter video or playlist URL", "Add video",	JOptionPane.PLAIN_MESSAGE, null, null, null);
 				if (userInput != null && !userInput.equals(""))
 				{
 					final String[] id = PlaylistWindow.this.parent.getVideoPlaylistID(userInput);
@@ -124,9 +124,9 @@ public class PlaylistWindow extends JFrame
 									allMatches.add(matcher.group());
 								}
 
-								for (int i = 0; i < allMatches.size(); i++)
+								for (String match : allMatches)
 								{
-									curString = allMatches.get(i);
+									curString = match;
 									//curString = curString.substring(curString.indexOf("data-title") + 12);
 									title = curString.substring(curString.indexOf("data-title") + 12);
 									title = title.substring(0, title.indexOf('"'));
@@ -149,9 +149,9 @@ public class PlaylistWindow extends JFrame
 										allMatches.add(matcher.group());
 									}
 
-									for (int i = 0; i < allMatches.size(); i++)
+									for (String match : allMatches)
 									{
-										curString = allMatches.get(i);
+										curString = match;
 										title = curString.substring(curString.indexOf("simpleText") + 14);
 										title = title.substring(0, title.indexOf('"'));
 										videoId = curString.substring(curString.indexOf("videoId") + 11);
@@ -186,6 +186,7 @@ public class PlaylistWindow extends JFrame
 		});
 		actionsContainer.add(addVideo);
 		JButton upButton = new JButton("↑");
+		upButton.setToolTipText("Move selected video higher in queue");
 		upButton.addActionListener(new ActionListener()
 		{
 			@Override
@@ -197,6 +198,7 @@ public class PlaylistWindow extends JFrame
 		});
 		actionsContainer.add(upButton);
 		JButton downButton = new JButton("↓");
+		downButton.setToolTipText("Move selected video lower in queue");
 		downButton.addActionListener(new ActionListener()
 		{
 			@Override
@@ -208,6 +210,7 @@ public class PlaylistWindow extends JFrame
 		});
 		actionsContainer.add(downButton);
 		JButton removeVideo = new JButton("-");
+		removeVideo.setToolTipText("Delete selected video from playlist");
 		removeVideo.addActionListener(new ActionListener()
 		{
 			@Override
@@ -227,6 +230,7 @@ public class PlaylistWindow extends JFrame
 
 		JPanel optionsContainer = new JPanel();
 		JButton newButton = new JButton("New");
+		newButton.setToolTipText("Clear this playlist and create new one");
 		newButton.addActionListener(new ActionListener()
 		{
 			@Override
@@ -238,6 +242,7 @@ public class PlaylistWindow extends JFrame
 		optionsContainer.add(newButton);
 
 		JButton loadButton = new JButton("Load");
+		loadButton.setToolTipText("Load playlist from local storage");
 		loadButton.addActionListener(new ActionListener()
 		{
 			@Override
@@ -271,7 +276,8 @@ public class PlaylistWindow extends JFrame
 			}
 		});
 		optionsContainer.add(loadButton);
-		JButton setPlaylist = new JButton("Set");
+		JButton setPlaylist = new JButton("Play");
+		setPlaylist.setToolTipText("Play this playlist");
 		setPlaylist.addActionListener(new ActionListener()
 		{
 			@Override
@@ -282,6 +288,7 @@ public class PlaylistWindow extends JFrame
 		});
 		optionsContainer.add(setPlaylist);
 		JButton saveButton = new JButton("Save");
+		saveButton.setToolTipText("Save this playlist locally");
 		saveButton.addActionListener(new ActionListener()
 		{
 			@Override
@@ -326,7 +333,6 @@ public class PlaylistWindow extends JFrame
 			}
 		});
 		optionsContainer.add(saveButton);
-
 
 		c.gridy = 1;
 		c.gridx = 0;
