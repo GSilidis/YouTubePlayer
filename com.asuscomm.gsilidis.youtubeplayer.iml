@@ -15,6 +15,7 @@
     <orderEntry type="library" name="Maven: com.hynnet:DJNativeSwing-SWT:1.0.0" level="project" />
     <orderEntry type="library" name="Maven: com.sun.jna:jna:3.0.9" level="project" />
     <orderEntry type="library" name="Maven: com.1stleg:jnativehook:2.1.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.swt:org.eclipse.swt.win32.win32.x86:4.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.swt:org.eclipse.swt.win32.win32.x86_64:4.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.swt:org.eclipse.swt.gtk.linux.x86:4.3" level="project" />

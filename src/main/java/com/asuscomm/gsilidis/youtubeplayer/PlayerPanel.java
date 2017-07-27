@@ -7,7 +7,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -25,23 +24,26 @@ public class PlayerPanel extends JPanel
 	/** Title of currently playing video */
 	private String videoTitle;
 
-	public PlayerPanel()
+	/** Parent frame */
+	private MainWindow parent;
+
+	public PlayerPanel(MainWindow parent)
 	{
 		super(new BorderLayout());
+		this.parent = parent;
 
 		// Navigation panel
 		JPanel inputPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
-		JLabel labelIn = new JLabel("Video URL:");
+		JLabel labelIn = new JLabel(parent.getStringFromBundle("playerPanel.videoURL"));
 		final JTextField idIn = new JTextField("");
-		//idIn.setColumns(30);
 		Action navigateToAction = new AbstractAction()
 		{
 			@Override
 			public void actionPerformed(ActionEvent actionEvent)
 			{
-				MainWindow parent = (MainWindow) SwingUtilities.getWindowAncestor(PlayerPanel.this);
-				String[] videoPlaylist = parent.getVideoPlaylistID(idIn.getText());
+
+				String[] videoPlaylist = PlayerPanel.this.parent.getVideoPlaylistID(idIn.getText());
 				if (videoPlaylist[1] == null)
 				{
 					if (videoPlaylist[0] == null)
@@ -58,8 +60,8 @@ public class PlayerPanel extends JPanel
 			}
 		};
 		idIn.addActionListener(navigateToAction);
-		JButton inButton = new JButton("GO");
-		inButton.setToolTipText("Play video or playlist");
+		JButton inButton = new JButton(parent.getStringFromBundle("playerPanel.go"));
+		inButton.setToolTipText(parent.getStringFromBundle("playerPanel.go.toolTip"));
 		inButton.addActionListener(navigateToAction);
 		c.insets = new Insets(0, 5, 5, 5);
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -69,12 +71,12 @@ public class PlayerPanel extends JPanel
 		inputPanel.add(idIn, c);
 		c.weightx = 0;
 		inputPanel.add(inButton, c);
-		inputPanel.setBorder(BorderFactory.createTitledBorder("Navigator"));
+		inputPanel.setBorder(BorderFactory.createTitledBorder(parent.getStringFromBundle("playerPanel.navigator")));
 		add(inputPanel, BorderLayout.NORTH);
 
 		// Player
 		JPanel webBrowserPanel = new JPanel(new BorderLayout());
-		webBrowserPanel.setBorder(BorderFactory.createTitledBorder("Player"));
+		webBrowserPanel.setBorder(BorderFactory.createTitledBorder(parent.getStringFromBundle("playerPanel.player")));
 		webBrowser = new CustomJWebBrowser();
 		webBrowserPanel.add(webBrowser, BorderLayout.CENTER);
 		webBrowser.setBarsVisible(false);
@@ -107,7 +109,7 @@ public class PlayerPanel extends JPanel
 			e.printStackTrace();
 		}
 		JButton prevButton = new JButton("⏮");
-		prevButton.setToolTipText("Previous song");
+		prevButton.setToolTipText(parent.getStringFromBundle("playerPanel.controls.prev"));
 		prevButton.setFont(unicodeFont);
 		prevButton.addActionListener(new ActionListener()
 		{
@@ -118,7 +120,7 @@ public class PlayerPanel extends JPanel
 			}
 		});
 		JButton startButton = new JButton("⏯");
-		startButton.setToolTipText("Play/pause");
+		startButton.setToolTipText(parent.getStringFromBundle("playerPanel.controls.playPause"));
 		startButton.setFont(unicodeFont);
 		startButton.addActionListener(new ActionListener()
 		{
@@ -129,7 +131,7 @@ public class PlayerPanel extends JPanel
 			}
 		});
 		JButton stopButton = new JButton("■");
-		stopButton.setToolTipText("Stop");
+		stopButton.setToolTipText(parent.getStringFromBundle("playerPanel.controls.stop"));
 		stopButton.setFont(unicodeFont);
 		stopButton.addActionListener(new ActionListener()
 		{
@@ -140,7 +142,7 @@ public class PlayerPanel extends JPanel
 			}
 		});
 		JButton nextButton = new JButton("⏭");
-		nextButton.setToolTipText("Next song");
+		nextButton.setToolTipText(parent.getStringFromBundle("playerPanel.controls.next"));
 		nextButton.addActionListener(new ActionListener()
 		{
 			@Override
@@ -154,7 +156,7 @@ public class PlayerPanel extends JPanel
 		buttonPanel.add(startButton);
 		buttonPanel.add(stopButton);
 		buttonPanel.add(nextButton);
-		buttonPanel.setBorder(BorderFactory.createTitledBorder("Playback controls"));
+		buttonPanel.setBorder(BorderFactory.createTitledBorder(parent.getStringFromBundle("playerPanel.controls")));
 		add(buttonPanel, BorderLayout.SOUTH);
 	}
 

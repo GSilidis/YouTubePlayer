@@ -1,5 +1,7 @@
 package com.asuscomm.gsilidis.youtubeplayer;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
@@ -25,11 +27,12 @@ public class PlaylistWindow extends JFrame
 
 	public PlaylistWindow(final MainWindow parent)
 	{
-		super("Playlist editor");
+		super(parent.getStringFromBundle("playlistEditor"));
 		this.parent = parent;
-		setMinimumSize(new Dimension(290, 250));
+		setMinimumSize(new Dimension(350, 250));
 		fileChooser = new JFileChooser();
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("Youtube playlist file (*.ypl)", "ypl");
+		FileNameExtensionFilter filter = new FileNameExtensionFilter(
+				parent.getStringFromBundle("dialogs.playlistFileDesc") + " (*.ypl)", "ypl");
 		fileChooser.setFileFilter(filter);
 		fileChooser.setAcceptAllFileFilterUsed(false);
 
@@ -51,23 +54,26 @@ public class PlaylistWindow extends JFrame
 
 		JPanel actionsContainer = new JPanel(new GridLayout(4, 0));
 		JButton addVideo = new JButton("+");
-		addVideo.setToolTipText("Add single video or playlist");
+		addVideo.setToolTipText(parent.getStringFromBundle("playlistEditor.addButton"));
 		addVideo.addActionListener(new ActionListener()
 		{
 			@Override
 			public void actionPerformed(ActionEvent actionEvent)
 			{
 				final String userInput = (String) JOptionPane.showInputDialog(PlaylistWindow.this,
-						"Enter video or playlist URL", "Add video",	JOptionPane.PLAIN_MESSAGE, null, null, null);
+						PlaylistWindow.this.parent.getStringFromBundle("dialogs.inputVideo"),
+						PlaylistWindow.this.parent.getStringFromBundle("dialogs.inputVideo.title"),
+						JOptionPane.PLAIN_MESSAGE, null, null, null);
 				if (userInput != null && !userInput.equals(""))
 				{
 					final String[] id = PlaylistWindow.this.parent.getVideoPlaylistID(userInput);
 					if (id[0] == null && id[1] == null)
 						return;
-					final JOptionPane optionPane = new JOptionPane("Fetching video information", JOptionPane.INFORMATION_MESSAGE,
-							JOptionPane.DEFAULT_OPTION, null, new Object[]{}, null);
+					final JOptionPane optionPane = new JOptionPane(
+							PlaylistWindow.this.parent.getStringFromBundle("dialogs.fetching"),
+							JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, new Object[]{}, null);
 					final JDialog dialog = new JDialog();
-					dialog.setTitle("Please wait");
+					dialog.setTitle(PlaylistWindow.this.parent.getStringFromBundle("dialogs.pleaseWait"));
 					dialog.setModal(true);
 					dialog.setContentPane(optionPane);
 					dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
@@ -130,6 +136,7 @@ public class PlaylistWindow extends JFrame
 									//curString = curString.substring(curString.indexOf("data-title") + 12);
 									title = curString.substring(curString.indexOf("data-title") + 12);
 									title = title.substring(0, title.indexOf('"'));
+									title = StringEscapeUtils.unescapeHtml4(title);
 									videoId = curString.substring(curString.indexOf("data-video-id") + 15);
 									videoId = videoId.substring(0, videoId.indexOf('"'));
 									listModel.addElement(title, videoId);
@@ -141,7 +148,7 @@ public class PlaylistWindow extends JFrame
 								{
 									html = html.substring(html.indexOf("\"playlistVideoListRenderer\": {")+30);
 
-									Matcher matcher = Pattern.compile("\"playlistVideoRenderer\": \\{.*?simpleText.*?\\}",
+									Matcher matcher=Pattern.compile("\"playlistVideoRenderer\": \\{.*?simpleText.*?\\}",
 											Pattern.DOTALL | Pattern.MULTILINE).matcher(html);
 
 									while (matcher.find())
@@ -154,6 +161,7 @@ public class PlaylistWindow extends JFrame
 										curString = match;
 										title = curString.substring(curString.indexOf("simpleText") + 14);
 										title = title.substring(0, title.indexOf('"'));
+										title = StringEscapeUtils.unescapeHtml4(title);
 										videoId = curString.substring(curString.indexOf("videoId") + 11);
 										videoId = videoId.substring(0, videoId.indexOf('"'));
 										listModel.addElement(title, videoId);
@@ -161,24 +169,33 @@ public class PlaylistWindow extends JFrame
 								}
 								else // Something unknown
 								{
-									JOptionPane.showMessageDialog(null, "Unable to fetch playlist information",
-											"Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(null,
+											PlaylistWindow.this.parent.getStringFromBundle("dialogs.fetchingFailedPlaylist"),
+											PlaylistWindow.this.parent.getStringFromBundle("dialogs.error"),
+											JOptionPane.ERROR_MESSAGE);
 								}
 							}
 						}
 					} catch (IndexOutOfBoundsException e)
 					{
-						JOptionPane.showMessageDialog(null, "Unable to fetch video information",
-								"Error", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(null,
+								PlaylistWindow.this.parent.getStringFromBundle("dialogs.fetchingFailedVideo"),
+								PlaylistWindow.this.parent.getStringFromBundle("dialogs.error"),
+								JOptionPane.ERROR_MESSAGE);
 					} catch (InterruptedException e)
 					{
-						JOptionPane.showMessageDialog(null, "Operation was interrupted",
-								"Error", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(null,
+								PlaylistWindow.this.parent.getStringFromBundle("dialogs.interrupted"),
+								PlaylistWindow.this.parent.getStringFromBundle("dialogs.error"),
+								JOptionPane.ERROR_MESSAGE);
 						e.printStackTrace();
 					} catch (ExecutionException e)
 					{
-						JOptionPane.showMessageDialog(null, "Unable to fetch video information:\n" +
-										e.toString(), "Error", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(null,
+								PlaylistWindow.this.parent.getStringFromBundle("dialogs.fetchingFailedVideo") + "\n" +
+										e.toString(),
+								PlaylistWindow.this.parent.getStringFromBundle("dialogs.error"),
+								JOptionPane.ERROR_MESSAGE);
 						e.printStackTrace();
 					}
 				}
@@ -186,7 +203,7 @@ public class PlaylistWindow extends JFrame
 		});
 		actionsContainer.add(addVideo);
 		JButton upButton = new JButton("↑");
-		upButton.setToolTipText("Move selected video higher in queue");
+		upButton.setToolTipText(parent.getStringFromBundle("playlistEditor.upButton"));
 		upButton.addActionListener(new ActionListener()
 		{
 			@Override
@@ -198,7 +215,7 @@ public class PlaylistWindow extends JFrame
 		});
 		actionsContainer.add(upButton);
 		JButton downButton = new JButton("↓");
-		downButton.setToolTipText("Move selected video lower in queue");
+		downButton.setToolTipText(parent.getStringFromBundle("playlistEditor.downButton"));
 		downButton.addActionListener(new ActionListener()
 		{
 			@Override
@@ -210,7 +227,7 @@ public class PlaylistWindow extends JFrame
 		});
 		actionsContainer.add(downButton);
 		JButton removeVideo = new JButton("-");
-		removeVideo.setToolTipText("Delete selected video from playlist");
+		removeVideo.setToolTipText(parent.getStringFromBundle("playlistEditor.removeButton"));
 		removeVideo.addActionListener(new ActionListener()
 		{
 			@Override
@@ -229,8 +246,8 @@ public class PlaylistWindow extends JFrame
 		container.add(actionsContainer, c);
 
 		JPanel optionsContainer = new JPanel();
-		JButton newButton = new JButton("New");
-		newButton.setToolTipText("Clear this playlist and create new one");
+		JButton newButton = new JButton(parent.getStringFromBundle("playlistEditor.new"));
+		newButton.setToolTipText(parent.getStringFromBundle("playlistEditor.new.toolTip"));
 		newButton.addActionListener(new ActionListener()
 		{
 			@Override
@@ -241,8 +258,8 @@ public class PlaylistWindow extends JFrame
 		});
 		optionsContainer.add(newButton);
 
-		JButton loadButton = new JButton("Load");
-		loadButton.setToolTipText("Load playlist from local storage");
+		JButton loadButton = new JButton(parent.getStringFromBundle("playlistEditor.load"));
+		loadButton.setToolTipText(parent.getStringFromBundle("playlistEditor.load.toolTip"));
 		loadButton.addActionListener(new ActionListener()
 		{
 			@Override
@@ -264,20 +281,26 @@ public class PlaylistWindow extends JFrame
 							}
 						} catch (IOException e)
 						{
-							JOptionPane.showMessageDialog(null, "Unable to read file\n" + e.toString(),
-									"Error", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(null,
+									PlaylistWindow.this.parent.getStringFromBundle("dialogs.readError") + "\n" +
+											e.toString(),
+									PlaylistWindow.this.parent.getStringFromBundle("dialogs.error"),
+									JOptionPane.ERROR_MESSAGE);
 						}
 					} catch (IOException e)
 					{
-						JOptionPane.showMessageDialog(null, "Unable to read file\n" + e.toString(),
-								"Error", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(null,
+								PlaylistWindow.this.parent.getStringFromBundle("dialogs.readError") + "\n" +
+										e.toString(),
+								PlaylistWindow.this.parent.getStringFromBundle("dialogs.error"),
+								JOptionPane.ERROR_MESSAGE);
 					}
 				}
 			}
 		});
 		optionsContainer.add(loadButton);
-		JButton setPlaylist = new JButton("Play");
-		setPlaylist.setToolTipText("Play this playlist");
+		JButton setPlaylist = new JButton(parent.getStringFromBundle("playlistEditor.play"));
+		setPlaylist.setToolTipText(parent.getStringFromBundle("playlistEditor.play.toolTip"));
 		setPlaylist.addActionListener(new ActionListener()
 		{
 			@Override
@@ -287,8 +310,8 @@ public class PlaylistWindow extends JFrame
 			}
 		});
 		optionsContainer.add(setPlaylist);
-		JButton saveButton = new JButton("Save");
-		saveButton.setToolTipText("Save this playlist locally");
+		JButton saveButton = new JButton(parent.getStringFromBundle("playlistEditor.save"));
+		saveButton.setToolTipText(parent.getStringFromBundle("playlistEditor.save.toolTip"));
 		saveButton.addActionListener(new ActionListener()
 		{
 			@Override
@@ -312,8 +335,11 @@ public class PlaylistWindow extends JFrame
 							writer = new PrintWriter(saveFile, "UTF-8");
 						} catch (IOException e)
 						{
-							JOptionPane.showMessageDialog(null, "Cannot write to selected file\n" + e.toString(),
-									"Error", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(null,
+									PlaylistWindow.this.parent.getStringFromBundle("dialogs.writeError") + "\n" +
+											e.toString(),
+									PlaylistWindow.this.parent.getStringFromBundle("dialogs.error"),
+									JOptionPane.ERROR_MESSAGE);
 						}
 						if (writer != null)
 						{
@@ -327,8 +353,10 @@ public class PlaylistWindow extends JFrame
 				}
 				else
 				{
-					JOptionPane.showMessageDialog(null, "Nothing to save",
-							"Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null,
+							PlaylistWindow.this.parent.getStringFromBundle("dialogs.nothingToSave"),
+							PlaylistWindow.this.parent.getStringFromBundle("dialogs.error"),
+							JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});

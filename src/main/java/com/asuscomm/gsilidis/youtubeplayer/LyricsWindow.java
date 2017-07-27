@@ -1,5 +1,7 @@
 package com.asuscomm.gsilidis.youtubeplayer;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -26,7 +28,7 @@ public class LyricsWindow extends JFrame
 
 	public LyricsWindow(String title, MainWindow parent)
 	{
-		super("Lyrics");
+		super(parent.getStringFromBundle("lyrics"));
 		this.parent = parent;
 		setMinimumSize(new Dimension(420, 300));
 
@@ -49,8 +51,8 @@ public class LyricsWindow extends JFrame
 		c.insets = new Insets(5, 7, 5, 7);
 		c.weightx = 1;
 		navPanel.add(artistField, c);
-		JButton swap = new JButton("<->");
-		swap.setToolTipText("Swap artist and song name fields");
+		JButton swap = new JButton(parent.getStringFromBundle("lyrics.swap"));
+		swap.setToolTipText(parent.getStringFromBundle("lyrics.swap.toolTip"));
 		swap.addActionListener(new ActionListener()
 		{
 			@Override
@@ -76,7 +78,7 @@ public class LyricsWindow extends JFrame
 		c.weighty = 0;
 		container.add(navPanel, c);
 
-		JButton search = new JButton("Search for lyrics");
+		JButton search = new JButton(parent.getStringFromBundle("lyrics.searchForLyrics"));
 		search.addActionListener(searchAction);
 		search.setAlignmentX(Component.CENTER_ALIGNMENT);
 		c = new GridBagConstraints();
@@ -158,15 +160,16 @@ public class LyricsWindow extends JFrame
 					"&song=" + URLEncoder.encode(songField.getText(), "UTF-8"));
 			String src = lyrics.substring(lyrics.indexOf("<LyricUrl>")+10, lyrics.indexOf("</LyricUrl>"));
 			lyrics  = lyrics.substring(lyrics.indexOf("<Lyric>")+7, lyrics.indexOf("</Lyric>")) +
-					  "\n\nSource: \n" + src;
+					  "\n\n" + parent.getStringFromBundle("lyrics.source") + ": \n" + src;
+			lyrics = StringEscapeUtils.unescapeHtml4(lyrics);
 		}
 		catch (StringIndexOutOfBoundsException e) // If lyrics not found, API returns malformed XML
 		{                                         // so method .substring(lyrics.indexOf("<Lyric>")) throws this exception
-			lyrics = "Lyrics not found";
+			lyrics = parent.getStringFromBundle("lyrics.notFound");
 		}
 		catch (IOException e)                     // This can be caused by connection problems
 		{
-			lyrics = "Error: unable to load lyrics.\n" + e.toString();
+			lyrics = parent.getStringFromBundle("lyrics.unableToLoad") + "\n" + e.toString();
 		}
 		return lyrics;
 	}

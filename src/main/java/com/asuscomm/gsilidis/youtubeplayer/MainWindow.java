@@ -20,6 +20,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 /**
  * Main window that contains menu and JPanel with player and controls
@@ -32,23 +33,27 @@ public class MainWindow extends JFrame implements WindowListener, NativeKeyListe
 	private LyricsWindow lyricsWindow;
 	/** JPanel for playlist editor */
 	private PlaylistWindow playlistWindow;
+	/** Resource bundle that contains all strings */
+	private ResourceBundle texts;
+
 	public MainWindow(String s)
 	{
 		super(s);
 		GlobalScreen.setEventDispatcher(new SwingDispatchService());
+		texts = ResourceBundle.getBundle("texts/Text", new CustomResourceBundleControl());
 
 		addWindowListener(this);
-		playerPanel = new PlayerPanel();
+		playerPanel = new PlayerPanel(this);
 		setMinimumSize(new Dimension(300, 300));
 
 		// Menu panel
 		JMenuBar menuBar;
 		menuBar = new JMenuBar();
 
-		JMenu playlistMenu = new JMenu("Playlist");
+		JMenu playlistMenu = new JMenu(texts.getString("menu.playlist"));
 		playlistMenu.getAccessibleContext().setAccessibleDescription("Playlist management");
 		menuBar.add(playlistMenu);
-		JMenuItem playlistEditor = new JMenuItem("Playlist editor");
+		JMenuItem playlistEditor = new JMenuItem(texts.getString("menu.item.playlistEditor"));
 		playlistEditor.addActionListener(new ActionListener()
 		{
 			@Override
@@ -72,10 +77,9 @@ public class MainWindow extends JFrame implements WindowListener, NativeKeyListe
 		playlistMenu.add(playlistEditor);
 
 
-		JMenu extraMenu = new JMenu("Extra");
-		extraMenu.getAccessibleContext().setAccessibleDescription("Additional features");
+		JMenu extraMenu = new JMenu(texts.getString("menu.extra"));
 		menuBar.add(extraMenu);
-		JMenuItem lyricsMenuItem = new JMenuItem("Lyrics");
+		JMenuItem lyricsMenuItem = new JMenuItem(texts.getString("menu.item.lyrics"));
 		lyricsMenuItem.addActionListener(new ActionListener()
 		{
 			@Override
@@ -105,6 +109,16 @@ public class MainWindow extends JFrame implements WindowListener, NativeKeyListe
 		getContentPane().add(playerPanel, BorderLayout.CENTER);
 	}
 
+	/**
+	 * Returns string in system locale from resource bundle
+	 * @param key Key for desired string
+	 * @return String for given key
+	 */
+	public String getStringFromBundle (String key)
+	{
+		return texts.getString(key);
+	}
+
 	/** Used for creating playlist using id of videos
 	 * @param IDs list of videos
 	 * @param isMoreThanOneVideo true when playlist contains more than one video
@@ -130,7 +144,8 @@ public class MainWindow extends JFrame implements WindowListener, NativeKeyListe
 			url = new URL(link);
 		} catch (MalformedURLException e)
 		{
-			JOptionPane.showMessageDialog(null, "URL is not recognised", "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, texts.getString("dialogs.URLNotRecognised"),
+					texts.getString("dialogs.error"), JOptionPane.ERROR_MESSAGE);
 			return result;
 		}
 
@@ -167,7 +182,9 @@ public class MainWindow extends JFrame implements WindowListener, NativeKeyListe
 				}
 			} else
 			{
-				JOptionPane.showMessageDialog(null, "Resource \'" + url.getHost() + "\' is not supported", "Error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, texts.getString("dialogs.resNotSupported1") +
+						" \'" + url.getHost() + "\' " + texts.getString("dialogs.resNotSupported2"),
+						texts.getString("dialogs.error"), JOptionPane.ERROR_MESSAGE);
 				return result;
 			}
 		}
@@ -262,8 +279,8 @@ public class MainWindow extends JFrame implements WindowListener, NativeKeyListe
 		}
 		catch (NativeHookException ex)
 		{
-			JOptionPane.showMessageDialog(null, "There was a problem registering native hook\nMedia keys is not supported",
-					"Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, texts.getString("dialogs.nativeHookException"),
+					texts.getString("dialogs.error"), JOptionPane.ERROR_MESSAGE);
 		}
 
 		GlobalScreen.addNativeKeyListener(this);

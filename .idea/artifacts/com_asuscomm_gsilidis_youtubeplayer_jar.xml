@@ -11,6 +11,7 @@
         <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/sun/jna/jna/3.0.9/jna-3.0.9.jar" path-in-jar="/" />
         <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/hynnet/DJNativeSwing-SWT/1.0.0/DJNativeSwing-SWT-1.0.0.jar" path-in-jar="/" />
         <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/hynnet/DJNativeSwing/1.0.0/DJNativeSwing-1.0.0.jar" path-in-jar="/" />
+        <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/apache/commons/commons-lang3/3.0/commons-lang3-3.0.jar" path-in-jar="/" />
       </element>
       <element id="directory" name="lib">
         <element id="library" level="project" name="Maven: org.eclipse.swt:org.eclipse.swt.gtk.linux.x86_64:4.3" />
