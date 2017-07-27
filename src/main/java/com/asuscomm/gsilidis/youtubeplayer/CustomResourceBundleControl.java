@@ -10,7 +10,7 @@ import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
 /**
- * Created by grigoriy on 26.07.17.
+ * Used for loading contents of resource bundle
  */
 public class CustomResourceBundleControl extends ResourceBundle.Control
 {
@@ -30,9 +30,11 @@ public class CustomResourceBundleControl extends ResourceBundle.Control
 		if (reload)
 		{
 			URL url = classLoader.getResource(resourceName);
-			if (url != null) {
+			if (url != null)
+			{
 				URLConnection connection = url.openConnection();
-				if (connection != null) {
+				if (connection != null)
+				{
 					connection.setUseCaches(false);
 					stream = connection.getInputStream();
 				}
@@ -41,10 +43,11 @@ public class CustomResourceBundleControl extends ResourceBundle.Control
 		{
 			stream = classLoader.getResourceAsStream(resourceName);
 		}
-		if (stream != null) {
+		if (stream != null)
+		{
 			try
 			{
-				// Only this line is changed to make it to read properties files as UTF-8.
+				// Only this line is changed to make it to read resource files as UTF-8.
 				bundle = new PropertyResourceBundle(new InputStreamReader(stream, "UTF-8"));
 			} finally
 			{

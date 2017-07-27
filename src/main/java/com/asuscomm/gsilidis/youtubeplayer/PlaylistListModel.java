@@ -38,8 +38,9 @@ public class PlaylistListModel extends AbstractListModel
 	/**
 	 * Swapping positions of current video and previous one
 	 * @param i position of video
+	 * @return true if item was moved
 	 */
-	public void moveUp(int i)
+	public boolean moveUp(int i)
 	{
 		if (i > 0)
 		{
@@ -51,14 +52,17 @@ public class PlaylistListModel extends AbstractListModel
 			ids.set(i-1, ids.get(i));
 			ids.set(i, buffer);
 			fireIntervalAdded(this, i-1, i);
+			return true;
 		}
+		return false;
 	}
 
 	/**
 	 * Swapping positions of current video and next one
 	 * @param i position of video
+	 * @return true if item was moved
 	 */
-	public void moveDown(int i)
+	public boolean moveDown(int i)
 	{
 		if (i != -1 && i < titles.size()-1)
 		{
@@ -70,7 +74,9 @@ public class PlaylistListModel extends AbstractListModel
 			ids.set(i+1, ids.get(i));
 			ids.set(i, buffer);
 			fireIntervalAdded(this, i, i+1);
+			return true;
 		}
+		return false;
 	}
 
 	/**

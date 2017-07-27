@@ -209,8 +209,13 @@ public class PlaylistWindow extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent actionEvent)
 			{
-				listModel.moveUp(list.getSelectedIndex());
-				list.clearSelection();
+				int [] indices = list.getSelectedIndices();
+				for (int i = 0; i < indices.length; i++)
+				{
+					if (!listModel.moveUp(indices[i]--))
+						return;
+				}
+				list.setSelectedIndices(indices);
 			}
 		});
 		actionsContainer.add(upButton);
@@ -221,8 +226,13 @@ public class PlaylistWindow extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent actionEvent)
 			{
-				listModel.moveDown(list.getSelectedIndex());
-				list.clearSelection();
+				int [] indices = list.getSelectedIndices();
+				for (int i = indices.length-1; i >= 0; i--)
+				{
+					if (!listModel.moveDown(indices[i]++))
+						return;
+				}
+				list.setSelectedIndices(indices);
 			}
 		});
 		actionsContainer.add(downButton);
@@ -233,7 +243,9 @@ public class PlaylistWindow extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent actionEvent)
 			{
-				listModel.removeItem(list.getSelectedIndex());
+				int [] indices = list.getSelectedIndices();
+				for (int i = indices.length-1; i >= 0; i--)
+					listModel.removeItem(indices[i]);
 				list.clearSelection();
 			}
 		});
