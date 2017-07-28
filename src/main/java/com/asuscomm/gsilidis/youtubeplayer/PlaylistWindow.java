@@ -108,7 +108,7 @@ public class PlaylistWindow extends JFrame
 						if (id[1] == null) // if fetching single video
 						{
 							html = html.substring(html.indexOf("<title>") + 7, html.indexOf(" - YouTube</title>"));
-							listModel.addElement(html, id[0]);
+							listModel.addElement(StringEscapeUtils.unescapeHtml4(html), id[0]);
 						}
 						else // if its playlist
 						{
@@ -285,6 +285,7 @@ public class PlaylistWindow extends JFrame
 					{
 						BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
 						String line;
+						listModel.clear();
 						try
 						{
 							while ((line = bufferedReader.readLine()) != null)
