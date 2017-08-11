@@ -18,6 +18,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -117,6 +118,14 @@ public class MainWindow extends JFrame implements WindowListener, NativeKeyListe
 	public String getStringFromBundle (String key)
 	{
 		return texts.getString(key);
+	}
+	/**
+	 * Returns all keys from resource bundle
+	 * @return All keys from bundle
+	 */
+	public Enumeration<String> getKeysFromBundle ()
+	{
+		return texts.getKeys();
 	}
 
 	/** Used for creating playlist using id of videos

@@ -12,6 +12,8 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import com.sun.java.swing.plaf.windows.resources.windows;
+import com.sun.java.swing.plaf.motif.resources.motif;
 
 /**
  * Playlist editor's window
@@ -30,6 +32,17 @@ public class PlaylistWindow extends JFrame
 		super(parent.getStringFromBundle("playlistEditor"));
 		this.parent = parent;
 		setMinimumSize(new Dimension(350, 250));
+
+		Enumeration<String> keys = parent.getKeysFromBundle();
+		while (keys.hasMoreElements())
+		{
+			String key = keys.nextElement();
+			if (key.startsWith("FileChooser"))
+			{
+				UIManager.put(key, parent.getStringFromBundle(key));
+			}
+		}
+
 		fileChooser = new JFileChooser();
 		FileNameExtensionFilter filter = new FileNameExtensionFilter(
 				parent.getStringFromBundle("dialogs.playlistFileDesc") + " (*.ypl)", "ypl");
@@ -60,6 +73,10 @@ public class PlaylistWindow extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent actionEvent)
 			{
+				UIManager.put("OptionPane.cancelButtonText",
+						PlaylistWindow.this.parent.getStringFromBundle("dialogs.cancel"));
+				UIManager.put("OptionPane.okButtonText",
+						PlaylistWindow.this.parent.getStringFromBundle("dialogs.ok"));
 				final String userInput = (String) JOptionPane.showInputDialog(PlaylistWindow.this,
 						PlaylistWindow.this.parent.getStringFromBundle("dialogs.inputVideo"),
 						PlaylistWindow.this.parent.getStringFromBundle("dialogs.inputVideo.title"),

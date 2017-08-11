@@ -2,7 +2,7 @@
   <artifact name="com.asuscomm.gsilidis.youtubeplayer:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/com_asuscomm_gsilidis_youtubeplayer_jar</output-path>
     <root id="root">
-      <element id="archive" name="com.asuscomm.gsilidis.youtubeplayer.jar">
+      <element id="archive" name="player.jar">
         <element id="directory" name="META-INF">
           <element id="file-copy" path="$PROJECT_DIR$/src/main/resources/META-INF/MANIFEST.MF" />
         </element>
