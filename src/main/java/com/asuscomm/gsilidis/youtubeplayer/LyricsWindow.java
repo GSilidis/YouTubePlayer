@@ -47,6 +47,7 @@ public class LyricsWindow extends JFrame
 		};
 		artistField = new JTextField(parsedTitle[0]);
 		artistField.addActionListener(searchAction);
+		artistField.setColumns(15);
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.insets = new Insets(5, 7, 5, 7);
 		c.weightx = 1;
@@ -68,6 +69,7 @@ public class LyricsWindow extends JFrame
 		navPanel.add(swap, c);
 		songField = new JTextField(parsedTitle[1]);
 		songField.addActionListener(searchAction);
+		songField.setColumns(artistField.getColumns());
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx = 1;
 		navPanel.add(songField, c);
