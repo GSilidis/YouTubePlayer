@@ -2,7 +2,7 @@
 Multiplatform YouTube player with media keys support
 ![main_img](https://github.com/GSilidis/YouTubePlayer/blob/master/img/main.png?raw=true)
 ## Features
-##### Multiplatform
+##### Cross-platform
 Supports Windows, Linux and Mac OS <br>
 ![multiplatform_img](https://github.com/GSilidis/YouTubePlayer/blob/master/img/multiplatform.png?raw=true)
 ##### Use media keys for playback control.
